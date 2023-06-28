@@ -82,7 +82,7 @@ const ProgramPlaygroundPage = ({
         <div className="flex flex-col gap-4">
           {program.idl.accounts &&
             program.idl.accounts.map((account, index) => (
-              <div key={index} className="p-4 bg-secondary rounded-xl">
+              <div key={index} className="p-4 bg-card rounded-xl">
                 <h2 className="mb-4 text-lg font-semibold">{account.name}</h2>
 
                 <Table>

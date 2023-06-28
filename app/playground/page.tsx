@@ -27,7 +27,7 @@ const PlaygroundPage = () => {
           programs.map((program) => (
             <Link
               key={program.programId}
-              className="flex justify-between w-full p-4 rounded-xl bg-secondary"
+              className="flex justify-between w-full p-4 rounded-xl bg-card"
               href={`/playground/program/${program.programId}`}
             >
               <h3>{program.name}</h3>
