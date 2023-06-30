@@ -9,6 +9,8 @@ const useCluster = () => {
 
   const rpcUrl = useMemo(() => getRpc(cluster), [cluster])
 
+  console.log(cluster, rpcUrl)
+
   return {
     cluster,
     setCluster,

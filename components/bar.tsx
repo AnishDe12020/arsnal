@@ -15,7 +15,7 @@ const Bar = () => {
   const { cluster, setCluster } = useCluster()
 
   return (
-    <div className="flex items-center justify-end w-full h-12 px-4 border-2 border-t-secondary">
+    <div className="flex items-center justify-end w-full h-12 px-4 mt-8 border-t-2 border-t-secondary">
       <Select value={cluster} onValueChange={(e) => setCluster(e as Cluster)}>
         <SelectTrigger className="h-8 w-28">
           <SelectValue />

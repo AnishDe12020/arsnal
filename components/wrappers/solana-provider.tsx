@@ -25,10 +25,8 @@ export const SolanaProvider = ({ children }: { children: React.ReactNode }) => {
 
   const { rpcUrl } = useCluster()
 
-  const endpoint = useMemo(() => rpcUrl, [])
-
   return (
-    <ConnectionProvider endpoint={endpoint}>
+    <ConnectionProvider endpoint={rpcUrl}>
       <WalletProvider wallets={wallets} autoConnect>
         {children}
       </WalletProvider>
