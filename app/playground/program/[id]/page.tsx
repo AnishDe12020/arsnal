@@ -1,29 +1,13 @@
 "use client"
 
 import { useMemo } from "react"
-import { notFound, useRouter } from "next/navigation"
-import { parseFieldType } from "@/utils/idl"
+import { notFound } from "next/navigation"
 import { getProgram } from "@/utils/localdb"
-import { AnchorProvider, Program, Wallet } from "@project-serum/anchor"
-import {
-  clusterApiUrl,
-  Connection,
-  Keypair,
-  Transaction,
-} from "@solana/web3.js"
+import { BorshAccountsCoder } from "@project-serum/anchor"
 import { useAsyncMemo } from "use-async-memo"
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import AccountCard from "@/components/account-card"
 import { Icons } from "@/components/icons"
-import TypeBadge from "@/components/type-badge"
 
 interface ProgramPlaygroundPageProps {
   params: {
@@ -72,6 +56,14 @@ const ProgramPlaygroundPage = ({
   //   return new Program(program.idl, program.programId, anchorProvider)
   // }, [program])
 
+  const accountsCoder = useMemo(() => {
+    if (!program) {
+      return null
+    }
+
+    return new BorshAccountsCoder(program.idl)
+  }, [program])
+
   console.log(program?.idl)
 
   return (
@@ -79,33 +71,14 @@ const ProgramPlaygroundPage = ({
       <h1 className="text-3xl font-semibold text-center">{program?.name}</h1>
 
       {program ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col w-full gap-4">
           {program.idl.accounts &&
             program.idl.accounts.map((account, index) => (
-              <div key={index} className="p-4 bg-card rounded-xl">
-                <h2 className="mb-4 text-lg font-semibold">{account.name}</h2>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>#</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {account.type.fields.map((field, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{field.name}</TableCell>
-                        <TableCell>
-                          <TypeBadge type={parseFieldType(field.type)} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <AccountCard
+                key={index}
+                account={account}
+                accountsCoder={accountsCoder}
+              />
             ))}
         </div>
       ) : (

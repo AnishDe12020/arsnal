@@ -6,7 +6,7 @@ const TypeBadge = ({ type }: { type: ITypeBadge }) => {
     <div
       className={cn(
         "font-mono text-xs px-1 py-0.5 inline-flex items-center rounded-sm",
-        type.color
+        "bg-purple-600/30 text-purple-300"
       )}
     >
       {type.value}
