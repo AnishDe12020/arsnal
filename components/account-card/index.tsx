@@ -1,5 +1,5 @@
 import { parseFieldType } from "@/utils/idl"
-import { AccountsCoder, Program } from "@project-serum/anchor"
+import { Program } from "@project-serum/anchor"
 import { Idl, IdlAccountDef } from "@project-serum/anchor/dist/cjs/idl"
 
 import TypeBadge from "../type-badge"

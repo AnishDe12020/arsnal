@@ -8,7 +8,9 @@ import { useConnection } from "@solana/wallet-adapter-react"
 import { Keypair, Transaction } from "@solana/web3.js"
 import { useAsyncMemo } from "use-async-memo"
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AccountCard from "@/components/account-card"
+import Errors from "@/components/errors"
 import { Icons } from "@/components/icons"
 
 interface ProgramPlaygroundPageProps {
@@ -65,16 +67,27 @@ const ProgramPlaygroundPage = ({
       <h1 className="text-3xl font-semibold text-center">{program?.name}</h1>
 
       {program && anchorProgram ? (
-        <div className="flex flex-col w-full gap-4">
-          {program.idl.accounts &&
-            program.idl.accounts.map((account, index) => (
-              <AccountCard
-                key={index}
-                account={account}
-                anchorProgram={anchorProgram}
-              />
-            ))}
-        </div>
+        <Tabs defaultValue="accounts" className="w-full">
+          <TabsList>
+            <TabsTrigger value="accounts">Accoutns</TabsTrigger>
+            <TabsTrigger value="errors">Errors</TabsTrigger>
+          </TabsList>
+          <TabsContent value="accounts">
+            <div className="flex flex-col w-full gap-4">
+              {program.idl.accounts &&
+                program.idl.accounts.map((account, index) => (
+                  <AccountCard
+                    key={index}
+                    account={account}
+                    anchorProgram={anchorProgram}
+                  />
+                ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="errors">
+            {program.idl.errors && <Errors errors={program.idl.errors} />}
+          </TabsContent>
+        </Tabs>
       ) : (
         <Icons.spinner className="w-8 h-8 mx-auto animate-spin" />
       )}
