@@ -69,7 +69,7 @@ const ProgramPlaygroundPage = ({
       {program && anchorProgram ? (
         <Tabs defaultValue="accounts" className="w-full">
           <TabsList>
-            <TabsTrigger value="accounts">Accoutns</TabsTrigger>
+            <TabsTrigger value="accounts">Accounts</TabsTrigger>
             <TabsTrigger value="errors">Errors</TabsTrigger>
           </TabsList>
           <TabsContent value="accounts">
