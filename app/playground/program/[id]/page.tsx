@@ -6,6 +6,7 @@ import { getProgram } from "@/utils/localdb"
 import { AnchorProvider, Program } from "@project-serum/anchor"
 import { useConnection } from "@solana/wallet-adapter-react"
 import { Keypair, Transaction } from "@solana/web3.js"
+import ReactJson from "react-json-view"
 import { useAsyncMemo } from "use-async-memo"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -71,6 +72,7 @@ const ProgramPlaygroundPage = ({
           <TabsList>
             <TabsTrigger value="accounts">Accounts</TabsTrigger>
             <TabsTrigger value="errors">Errors</TabsTrigger>
+            <TabsTrigger value="raw-idl">Raw IDL</TabsTrigger>
           </TabsList>
           <TabsContent value="accounts">
             <div className="flex flex-col w-full gap-4">
@@ -86,6 +88,18 @@ const ProgramPlaygroundPage = ({
           </TabsContent>
           <TabsContent value="errors">
             {program.idl.errors && <Errors errors={program.idl.errors} />}
+          </TabsContent>
+          <TabsContent value="raw-idl">
+            <ReactJson
+              src={program.idl}
+              theme="tomorrow"
+              style={{
+                borderRadius: "1rem",
+                padding: "1rem",
+                marginTop: "1rem",
+              }}
+              collapsed={1}
+            />
           </TabsContent>
         </Tabs>
       ) : (

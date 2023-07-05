@@ -27,7 +27,16 @@ const DeserializeAccountAddress = ({
       return null
     }
 
-    const accountInfo = await connection.getAccountInfo(new PublicKey(address))
+    let publicKey
+
+    try {
+      publicKey = new PublicKey(address)
+    } catch (error) {
+      toast.error("Invalid address")
+      return null
+    }
+
+    const accountInfo = await connection.getAccountInfo(publicKey)
 
     if (!accountInfo) {
       toast.error("Account not found")
@@ -56,7 +65,7 @@ const DeserializeAccountAddress = ({
             padding: "1rem",
             marginTop: "1rem",
           }}
-          collapsed
+          collapsed={1}
         />
       )}
     </>

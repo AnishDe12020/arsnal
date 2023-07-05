@@ -46,7 +46,7 @@ const DeserializeAccountData = ({
             padding: "1rem",
             marginTop: "1rem",
           }}
-          collapsed
+          collapsed={1}
         />
       )}
     </>

@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 
 interface ErrorsProps {
   errors: IdlErrorCode[]
