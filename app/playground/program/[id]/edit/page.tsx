@@ -1,11 +1,13 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { notFound, useRouter } from "next/navigation"
+import { isValidIdl } from "@/utils/idl"
+import { editProgram, getProgram } from "@/utils/localdb"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { createId } from "@paralleldrive/cuid2"
 import { PublicKey } from "@solana/web3.js"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { useAsyncMemo } from "use-async-memo"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -21,24 +23,51 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-import { isValidIdl } from "../../../utils/idl"
-import { addProgram } from "../../../utils/localdb"
-
-const newProgramFormSchema = z.object({
+const editProgramFormSchema = z.object({
   name: z.string(),
   idl: z.string(),
   programId: z.string().optional(),
 })
 
-const PlaygroundNewPage = () => {
-  const form = useForm<z.infer<typeof newProgramFormSchema>>({
-    resolver: zodResolver(newProgramFormSchema),
+interface ProgramPlaygroundPageProps {
+  params: {
+    id: string
+  }
+}
+
+const PlaygroundEditPage = ({ params: { id } }: ProgramPlaygroundPageProps) => {
+  const existingProgram = useAsyncMemo(
+    async () => {
+      const program = await getProgram(id)
+
+      if (!program) {
+        notFound()
+      }
+
+      form.reset({
+        idl: JSON.stringify(program.idl, null, 2),
+        name: program.name,
+        programId: program.programId,
+      })
+
+      return program
+    },
+    [id],
+    null
+  )
+
+  const form = useForm<z.infer<typeof editProgramFormSchema>>({
+    resolver: zodResolver(editProgramFormSchema),
   })
 
   const router = useRouter()
 
-  const handleNewProgramSubmit = form.handleSubmit(
-    async (values: z.infer<typeof newProgramFormSchema>) => {
+  const handleEditProgramSubmit = form.handleSubmit(
+    async (values: z.infer<typeof editProgramFormSchema>) => {
+      if (!existingProgram) {
+        return
+      }
+
       let programId: PublicKey | undefined = undefined
 
       if (values.programId) {
@@ -64,17 +93,20 @@ const PlaygroundNewPage = () => {
         return
       }
 
-      const cuid = createId()
-
       toast.promise(
-        addProgram(cuid, values.name, idl, programId && programId.toBase58()),
+        editProgram(
+          existingProgram.id,
+          values.name,
+          idl,
+          programId && programId.toBase58()
+        ),
         {
-          loading: "Adding program...",
+          loading: "Updating program...",
           success: () => {
-            router.push(`/playground/program/${cuid}`)
-            return "Program added"
+            router.push(`/playground/program/${existingProgram.id}`)
+            return "Updated program"
           },
-          error: "Failed to add program",
+          error: "Failed to update program",
         }
       )
     }
@@ -85,7 +117,7 @@ const PlaygroundNewPage = () => {
       <Form {...form}>
         <form
           className="flex flex-col max-w-xl gap-8"
-          onSubmit={handleNewProgramSubmit}
+          onSubmit={handleEditProgramSubmit}
         >
           <FormField
             control={form.control}
@@ -149,11 +181,11 @@ const PlaygroundNewPage = () => {
             )}
           />
 
-          <Button type="submit">Add Program</Button>
+          <Button type="submit">Update Program</Button>
         </form>
       </Form>
     </>
   )
 }
 
-export default PlaygroundNewPage
+export default PlaygroundEditPage

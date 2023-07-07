@@ -1,17 +1,46 @@
 "use client"
 
-import { truncate } from "fs"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { getPrograms } from "@/utils/localdb"
+import { getPrograms, removeProgram } from "@/utils/localdb"
 import { truncatePubkey } from "@/utils/truncate"
 import { PlusIcon } from "lucide-react"
-import { useAsyncMemo } from "use-async-memo"
+import { toast } from "sonner"
 
+import { LocalProgram } from "@/types/program"
 import { cn } from "@/lib/utils"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { buttonVariants } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 const PlaygroundPage = () => {
-  const programs = useAsyncMemo(getPrograms, [], [])
+  const [programs, setPrograms] = useState<LocalProgram[]>([])
+
+  useEffect(() => {
+    const asyncGetPrograms = async () => {
+      const programsRes = await getPrograms()
+      setPrograms(programsRes)
+    }
+
+    asyncGetPrograms()
+  }, [])
 
   console.log(programs)
 
@@ -24,19 +53,82 @@ const PlaygroundPage = () => {
 
       <div className="flex flex-col w-full gap-4">
         {programs.length > 0 ? (
-          programs.map((program) => (
-            <Link
-              key={program.programId}
-              className="flex justify-between w-full p-4 rounded-xl bg-card"
-              href={`/playground/program/${program.programId}`}
-            >
-              <h3>{program.name}</h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>#</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {programs.map((program, index) => (
+                <TableRow key={index}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{program.name}</TableCell>
+                  <TableCell>
+                    {program.programId
+                      ? truncatePubkey(program.programId)
+                      : "-"}
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    <Link
+                      href={`/playground/program/${program.id}`}
+                      className={cn(buttonVariants({ size: "sm" }))}
+                    >
+                      View
+                    </Link>
 
-              <p className="text-gray-400">
-                {truncatePubkey(program.programId)}
-              </p>
-            </Link>
-          ))
+                    <Link
+                      href={`/playground/program/${program.id}/edit`}
+                      className={cn(buttonVariants({ size: "sm" }))}
+                    >
+                      Edit
+                    </Link>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger
+                        className={buttonVariants({
+                          variant: "destructive",
+                          size: "sm",
+                        })}
+                      >
+                        Remove
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you sure you want to remove this program?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This is an irreversible action.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className={buttonVariants({
+                              variant: "destructive",
+                            })}
+                            onClick={async () => {
+                              await removeProgram(program.id)
+                              setPrograms(await getPrograms())
+                              toast.success("Program removed")
+                            }}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         ) : (
           <p className="text-lg text-center text-semibold">
             No programs yet. Create one by clicking the button above.

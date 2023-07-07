@@ -5,7 +5,7 @@ import { notFound } from "next/navigation"
 import { getProgram } from "@/utils/localdb"
 import { AnchorProvider, Program } from "@project-serum/anchor"
 import { useConnection } from "@solana/wallet-adapter-react"
-import { Keypair, Transaction } from "@solana/web3.js"
+import { Keypair, PublicKey, Transaction } from "@solana/web3.js"
 import ReactJson from "react-json-view"
 import { useAsyncMemo } from "use-async-memo"
 
@@ -60,7 +60,11 @@ const ProgramPlaygroundPage = ({
       }
     )
 
-    return new Program(program.idl, program.programId, anchorProvider)
+    return new Program(
+      program.idl,
+      program.programId || PublicKey.unique(),
+      anchorProvider
+    )
   }, [program, connection])
 
   return (
@@ -76,14 +80,17 @@ const ProgramPlaygroundPage = ({
           </TabsList>
           <TabsContent value="accounts">
             <div className="flex flex-col w-full gap-4">
-              {program.idl.accounts &&
+              {program.idl.accounts && program.idl.accounts.length > 0 ? (
                 program.idl.accounts.map((account, index) => (
                   <AccountCard
                     key={index}
                     account={account}
                     anchorProgram={anchorProgram}
                   />
-                ))}
+                ))
+              ) : (
+                <p>No accounts found for this program</p>
+              )}
             </div>
           </TabsContent>
           <TabsContent value="errors">
