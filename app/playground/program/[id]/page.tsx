@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AccountCard from "@/components/account-card"
 import Errors from "@/components/errors"
 import { Icons } from "@/components/icons"
+import InstructionsCard from "@/components/instructions/card"
 import TypeCard from "@/components/type-card"
 
 interface ProgramPlaygroundPageProps {
@@ -78,6 +79,7 @@ const ProgramPlaygroundPage = ({
         <Tabs defaultValue={params.get("tab") ?? "accounts"} className="w-full">
           <TabsList>
             <TabsTrigger value="accounts">Accounts</TabsTrigger>
+            <TabsTrigger value="instructions">Instructions</TabsTrigger>
             <TabsTrigger value="types">Types</TabsTrigger>
             <TabsTrigger value="errors">Errors</TabsTrigger>
             <TabsTrigger value="raw-idl">Raw IDL</TabsTrigger>
@@ -97,6 +99,22 @@ const ProgramPlaygroundPage = ({
               )}
             </div>
           </TabsContent>
+          <TabsContent value="instructions">
+            <div className="flex flex-col w-full gap-4">
+              {program.idl.instructions &&
+              program.idl.instructions.length > 0 ? (
+                program.idl.instructions.map((instruction, index) => (
+                  <InstructionsCard
+                    key={index}
+                    instruction={instruction}
+                    anchorProgram={anchorProgram}
+                  />
+                ))
+              ) : (
+                <p>No instructions found for this program</p>
+              )}
+            </div>
+          </TabsContent>
           <TabsContent value="types">
             <div className="flex flex-col w-full gap-4">
               {program.idl.types && program.idl.types.length > 0 ? (
@@ -104,7 +122,7 @@ const ProgramPlaygroundPage = ({
                   <TypeCard key={index} type={type} />
                 ))
               ) : (
-                <p>No accounts found for this program</p>
+                <p>No types found for this program</p>
               )}
             </div>
           </TabsContent>
