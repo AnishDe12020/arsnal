@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import AccountCard from "@/components/account-card"
 import Errors from "@/components/errors"
 import { Icons } from "@/components/icons"
+import TypeCard from "@/components/type-card"
 
 interface ProgramPlaygroundPageProps {
   params: {
@@ -75,6 +76,7 @@ const ProgramPlaygroundPage = ({
         <Tabs defaultValue="accounts" className="w-full">
           <TabsList>
             <TabsTrigger value="accounts">Accounts</TabsTrigger>
+            <TabsTrigger value="types">Types</TabsTrigger>
             <TabsTrigger value="errors">Errors</TabsTrigger>
             <TabsTrigger value="raw-idl">Raw IDL</TabsTrigger>
           </TabsList>
@@ -85,6 +87,21 @@ const ProgramPlaygroundPage = ({
                   <AccountCard
                     key={index}
                     account={account}
+                    anchorProgram={anchorProgram}
+                  />
+                ))
+              ) : (
+                <p>No accounts found for this program</p>
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="types">
+            <div className="flex flex-col w-full gap-4">
+              {program.idl.types && program.idl.types.length > 0 ? (
+                program.idl.types.map((type, index) => (
+                  <TypeCard
+                    key={index}
+                    type={type}
                     anchorProgram={anchorProgram}
                   />
                 ))
