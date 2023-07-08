@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { notFound } from "next/navigation"
+import { notFound, useSearchParams } from "next/navigation"
 import { getProgram } from "@/utils/localdb"
 import { AnchorProvider, Program } from "@project-serum/anchor"
 import { useConnection } from "@solana/wallet-adapter-react"
@@ -68,12 +68,14 @@ const ProgramPlaygroundPage = ({
     )
   }, [program, connection])
 
+  const params = useSearchParams()
+
   return (
     <>
       <h1 className="text-3xl font-semibold text-center">{program?.name}</h1>
 
       {program && anchorProgram ? (
-        <Tabs defaultValue="accounts" className="w-full">
+        <Tabs defaultValue={params.get("tab") ?? "accounts"} className="w-full">
           <TabsList>
             <TabsTrigger value="accounts">Accounts</TabsTrigger>
             <TabsTrigger value="types">Types</TabsTrigger>
@@ -99,11 +101,7 @@ const ProgramPlaygroundPage = ({
             <div className="flex flex-col w-full gap-4">
               {program.idl.types && program.idl.types.length > 0 ? (
                 program.idl.types.map((type, index) => (
-                  <TypeCard
-                    key={index}
-                    type={type}
-                    anchorProgram={anchorProgram}
-                  />
+                  <TypeCard key={index} type={type} />
                 ))
               ) : (
                 <p>No accounts found for this program</p>

@@ -28,7 +28,10 @@ interface AccountCardProps {
 
 const AccountCard = ({ account, anchorProgram }: AccountCardProps) => {
   return (
-    <div className="w-full p-4 bg-card rounded-xl">
+    <div
+      className="w-full p-4 bg-card rounded-xl"
+      id={`account-${account.name}`}
+    >
       <h2 className="text-xl font-bold">{account.name}</h2>
 
       <Table>

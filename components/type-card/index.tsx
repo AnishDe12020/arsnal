@@ -1,23 +1,9 @@
 import { parseFieldType } from "@/utils/idl"
 import { Program } from "@project-serum/anchor"
-import {
-  Idl,
-  IdlAccountDef,
-  IdlField,
-  IdlType,
-  IdlTypeDef,
-} from "@project-serum/anchor/dist/cjs/idl"
+import { Idl, IdlTypeDef } from "@project-serum/anchor/dist/cjs/idl"
 import ReactJson from "react-json-view"
 
-import { cn } from "@/lib/utils"
-
 import TypeBadge from "../type-badge"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion"
 import {
   Table,
   TableBody,
@@ -26,18 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 
 interface TypeCardProps {
   type: IdlTypeDef
-  anchorProgram: Program<Idl>
 }
 
-const TypeCard = ({ type, anchorProgram }: TypeCardProps) => {
-  console.log(type)
-
+const TypeCard = ({ type }: TypeCardProps) => {
   return (
-    <div className="w-full p-4 bg-card rounded-xl">
+    <div className="w-full p-4 bg-card rounded-xl" id={`type-${type.name}`}>
       <h2 className="text-xl font-bold">{type.name}</h2>
 
       {type.type.kind === "struct" && (
