@@ -1,8 +1,10 @@
 import { parseFieldType } from "@/utils/idl"
 import { Idl, Program } from "@project-serum/anchor"
 import { IdlInstruction } from "@project-serum/anchor/dist/cjs/idl"
+import { AccordionItem } from "@radix-ui/react-accordion"
 
 import TypeBadge from "../type-badge"
+import { Accordion, AccordionContent, AccordionTrigger } from "../ui/accordion"
 import {
   Table,
   TableBody,
@@ -11,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table"
+import IxBuilder from "./builder"
 
 interface InstructionsProps {
   instruction: IdlInstruction
@@ -81,6 +84,18 @@ const InstructionsCard = ({
           ))}
         </TableBody>
       </Table>
+
+      <Accordion type="single" collapsible className="border-none">
+        <AccordionItem value="builder">
+          <AccordionTrigger>Builder</AccordionTrigger>
+          <AccordionContent>
+            <IxBuilder
+              anchorProgram={anchorProgram}
+              instruction={instruction}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }

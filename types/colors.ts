@@ -8,4 +8,5 @@ export const colors = {
 export interface ITypeBadge {
   color: string
   value: string
+  defined?: boolean
 }

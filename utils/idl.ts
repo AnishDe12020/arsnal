@@ -28,6 +28,7 @@ export const parseFieldType = (fieldType: IdlType): ITypeBadge => {
     return {
       color: colors.green,
       value: fieldType.defined,
+      defined: true,
     }
   } else if ("option" in fieldType) {
     return {

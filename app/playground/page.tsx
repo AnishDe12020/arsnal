@@ -42,8 +42,6 @@ const PlaygroundPage = () => {
     asyncGetPrograms()
   }, [])
 
-  console.log(programs)
-
   return (
     <>
       <Link className={cn(buttonVariants())} href="/playground/new">
