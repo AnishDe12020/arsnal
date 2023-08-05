@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Program } from "@project-serum/anchor"
 import { Idl, IdlInstruction } from "@project-serum/anchor/dist/cjs/idl"
-import { PublicKey } from "@solana/web3.js"
+import { Keypair, PublicKey } from "@solana/web3.js"
 import { X } from "lucide-react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 
 import { Button } from "../ui/button"
@@ -23,8 +24,8 @@ const IxBuilder = ({ anchorProgram, instruction }: IxBuilderProps) => {
         .object({
           name: z.string(),
           address: z.string(),
-          isMut: z.boolean(),
-          isSigner: z.boolean(),
+          isMut: z.boolean().optional(),
+          isSigner: z.boolean().optional(),
         })
         .required()
     ),
@@ -53,12 +54,94 @@ const IxBuilder = ({ anchorProgram, instruction }: IxBuilderProps) => {
     },
   })
 
+  console.log("e", form.formState.errors)
+
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof formSchema>) => {
       const { accounts, args } = values
 
-      console.log(accounts)
-      console.log(args)
+      accounts.forEach((account) => {
+        if (!account.address) {
+          toast.error(`Address missing for account: ${account.name}`)
+          return
+        }
+      })
+
+      args.forEach((arg) => {
+        if (!arg.value) {
+          toast.error(`Value missing for argument: ${arg.name}`)
+          return
+        }
+      })
+
+      console.log(
+        args.map((arg) => {
+          try {
+            return JSON.parse(arg.value)
+          } catch (e) {
+            console.log(arg.value, e)
+            return arg.value
+          }
+        })
+      )
+
+      console.log(
+        accounts.reduce(
+          (acc, curr) => ({
+            ...acc,
+            [curr.name]: new PublicKey(curr.address),
+          }),
+          {}
+        )
+      )
+
+      console.log(
+        anchorProgram.idl.instructions.filter(
+          (i) => i.name === instruction.name
+        )[0].accounts
+      )
+
+      const payerKeypair = Keypair.generate()
+
+      console.log(
+        accounts.reduce(
+          (acc, curr) => ({
+            ...acc,
+            [curr.name]: curr.address,
+          }),
+          {}
+        )
+      )
+
+      const ix = await anchorProgram.methods
+        .createDid(
+          args.map((arg) => {
+            try {
+              return JSON.parse(arg.value)
+            } catch (e) {
+              console.log(arg.value, e)
+              return arg.value
+            }
+          })
+        )
+        .accounts(
+          accounts.reduce(
+            (acc, curr) => ({
+              ...acc,
+              [curr.name]: curr.address,
+            }),
+            {}
+          )
+          // {
+          //   payer: payerKeypair.publicKey,
+          //   did: "GYjw1SGNqHkh6BckaECq6rneb9tAH8XtV4MX7Myvesd2",
+          //   systemProgram: "Sysvar1nstructions1111111111111111111111111",
+          //   ixSysvar: "Sysvar1nstructions1111111111111111111111111",
+          // }
+        )
+        .instruction()
+
+      console.log(ix)
     }
   )
 
@@ -66,7 +149,11 @@ const IxBuilder = ({ anchorProgram, instruction }: IxBuilderProps) => {
     <Form {...form}>
       <form className="flex flex-col w-full gap-8" onSubmit={onSubmit}>
         {/* @ts-ignore */}
-        <AccountsInput control={form.control} name="accounts" />
+        <AccountsInput
+          control={form.control}
+          name="accounts"
+          setValue={form.setValue}
+        />
         {/* @ts-ignore */}
         <ArgsInput control={form.control} name="args" />
 

@@ -1,4 +1,4 @@
-import { SystemProgram } from "@solana/web3.js"
+import { SystemProgram, SYSVAR_INSTRUCTIONS_PUBKEY } from "@solana/web3.js"
 
 export interface KnownAccount {
   name: string
@@ -9,6 +9,10 @@ export const knownAccounts: KnownAccount[] = [
   {
     name: "systemProgram",
     address: SystemProgram.programId.toBase58(),
+  },
+  {
+    name: "ixSysvar",
+    address: SYSVAR_INSTRUCTIONS_PUBKEY.toBase58(),
   },
 ]
 

@@ -1,5 +1,5 @@
 import { getKnownAccount, isKnownAccount } from "@/utils/knownAccount"
-import { Control, useFieldArray } from "react-hook-form"
+import { Control, useFieldArray, UseFormSetValue } from "react-hook-form"
 
 import { Button } from "../ui/button"
 import { FormControl, FormField, FormItem } from "../ui/form"
@@ -17,9 +17,10 @@ import {
 interface AccountsInputProps {
   control: Control
   name: string
+  setValue: UseFormSetValue<any>
 }
 
-const AccountsInput = ({ control, name }: AccountsInputProps) => {
+const AccountsInput = ({ control, name, setValue }: AccountsInputProps) => {
   const { fields } = useFieldArray({
     control,
     name,
@@ -88,8 +89,9 @@ const AccountsInput = ({ control, name }: AccountsInputProps) => {
                           className="w-full"
                           variant="secondary"
                           onClick={() =>
-                            field.onChange(
-                              () => getKnownAccount(account.name).address
+                            setValue(
+                              `accounts.${index}.address`,
+                              getKnownAccount(account.name).address
                             )
                           }
                         >
