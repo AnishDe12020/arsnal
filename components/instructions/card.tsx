@@ -46,12 +46,14 @@ const InstructionsCard = ({
               <TableCell>{index + 1}</TableCell>
               <TableCell>{account.name}</TableCell>
               <TableCell className="flex gap-2">
+                {/* @ts-ignore  */}
                 {account.isMut && (
                   <div className="font-mono text-xs px-1 py-0.5 inline-flex items-center rounded-sm bg-red-600/30 text-red-300">
                     Mutable
                   </div>
                 )}
 
+                {/* @ts-ignore  */}
                 {account.isSigner && (
                   <div className="font-mono text-xs px-1 py-0.5 inline-flex items-center rounded-sm bg-green-600/30 text-green-300">
                     Signer

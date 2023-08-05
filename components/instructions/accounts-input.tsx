@@ -42,6 +42,7 @@ const AccountsInput = ({ control, name, setValue }: AccountsInputProps) => {
           {fields.map((account, index) => (
             <TableRow key={index}>
               <TableCell>{index + 1}</TableCell>
+              {/* @ts-ignore  */}
               <TableCell>{account.name}</TableCell>
               <TableCell>
                 <FormField
@@ -84,6 +85,7 @@ const AccountsInput = ({ control, name, setValue }: AccountsInputProps) => {
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
+                      {/* @ts-ignore  */}
                       {isKnownAccount(account.name) && (
                         <Button
                           className="w-full"
@@ -91,6 +93,7 @@ const AccountsInput = ({ control, name, setValue }: AccountsInputProps) => {
                           onClick={() =>
                             setValue(
                               `accounts.${index}.address`,
+                              // @ts-ignore
                               getKnownAccount(account.name).address
                             )
                           }

@@ -1,9 +1,11 @@
+import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Program } from "@project-serum/anchor"
 import { Idl, IdlInstruction } from "@project-serum/anchor/dist/cjs/idl"
-import { Keypair, PublicKey } from "@solana/web3.js"
+import { Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js"
 import { X } from "lucide-react"
 import { useForm } from "react-hook-form"
+import ReactJson from "react-json-view"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -39,12 +41,16 @@ const IxBuilder = ({ anchorProgram, instruction }: IxBuilderProps) => {
     ),
   })
 
+  const [ix, setIx] = useState<TransactionInstruction>()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       accounts: instruction.accounts.map((account) => ({
         name: account.name,
+        // @ts-ignore
         isMut: account.isMut,
+        // @ts-ignore
         isSigner: account.isSigner,
       })),
       args: instruction.args.map((arg) => ({
@@ -53,8 +59,6 @@ const IxBuilder = ({ anchorProgram, instruction }: IxBuilderProps) => {
       })),
     },
   })
-
-  console.log("e", form.formState.errors)
 
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof formSchema>) => {
@@ -74,52 +78,12 @@ const IxBuilder = ({ anchorProgram, instruction }: IxBuilderProps) => {
         }
       })
 
-      console.log(
-        args.map((arg) => {
-          try {
-            return JSON.parse(arg.value)
-          } catch (e) {
-            console.log(arg.value, e)
-            return arg.value
-          }
-        })
-      )
-
-      console.log(
-        accounts.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.name]: new PublicKey(curr.address),
-          }),
-          {}
-        )
-      )
-
-      console.log(
-        anchorProgram.idl.instructions.filter(
-          (i) => i.name === instruction.name
-        )[0].accounts
-      )
-
-      const payerKeypair = Keypair.generate()
-
-      console.log(
-        accounts.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.name]: curr.address,
-          }),
-          {}
-        )
-      )
-
-      const ix = await anchorProgram.methods
+      const methodsBuilder = await anchorProgram.methods
         .createDid(
-          args.map((arg) => {
+          ...args.map((arg) => {
             try {
               return JSON.parse(arg.value)
             } catch (e) {
-              console.log(arg.value, e)
               return arg.value
             }
           })
@@ -132,34 +96,42 @@ const IxBuilder = ({ anchorProgram, instruction }: IxBuilderProps) => {
             }),
             {}
           )
-          // {
-          //   payer: payerKeypair.publicKey,
-          //   did: "GYjw1SGNqHkh6BckaECq6rneb9tAH8XtV4MX7Myvesd2",
-          //   systemProgram: "Sysvar1nstructions1111111111111111111111111",
-          //   ixSysvar: "Sysvar1nstructions1111111111111111111111111",
-          // }
         )
-        .instruction()
 
-      console.log(ix)
+      const builtIx = await methodsBuilder.instruction()
+      setIx(builtIx)
     }
   )
 
   return (
-    <Form {...form}>
-      <form className="flex flex-col w-full gap-8" onSubmit={onSubmit}>
-        {/* @ts-ignore */}
-        <AccountsInput
-          control={form.control}
-          name="accounts"
-          setValue={form.setValue}
-        />
-        {/* @ts-ignore */}
-        <ArgsInput control={form.control} name="args" />
+    <div>
+      <Form {...form}>
+        <form className="flex flex-col w-full gap-8" onSubmit={onSubmit}>
+          <AccountsInput
+            // @ts-ignore
+            control={form.control}
+            name="accounts"
+            setValue={form.setValue}
+          />
+          {/* @ts-ignore */}
+          <ArgsInput control={form.control} name="args" />
+          <Button type="submit">Submit</Button>
+        </form>
+      </Form>
 
-        <Button type="submit">Submit</Button>
-      </form>
-    </Form>
+      {ix && (
+        <ReactJson
+          src={ix}
+          theme="tomorrow"
+          style={{
+            borderRadius: "1rem",
+            padding: "1rem",
+            marginTop: "1rem",
+          }}
+          collapsed={1}
+        />
+      )}
+    </div>
   )
 }
 

@@ -42,6 +42,7 @@ const ArgsInput = ({ control, name }: ArgsInputProps) => {
           {fields.map((arg, index) => (
             <TableRow key={index}>
               <TableCell>{index + 1}</TableCell>
+              {/* @ts-ignore  */}
               <TableCell>{arg.name}</TableCell>
               <TableCell>
                 <FormField
