@@ -1,6 +1,7 @@
 import "@/styles/globals.css"
 
 import { Metadata } from "next"
+import Script from "next/script"
 
 import { siteConfig } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
@@ -50,6 +51,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <Toaster />
                 <div className="flex-1">{children}</div>
                 <Bar />
+                {process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL &&
+                  process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+                    <Script
+                      src={process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL}
+                      data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+                      strategy="lazyOnload"
+                    />
+                  )}
               </div>
             </SolanaProvider>
           </ThemeProvider>
